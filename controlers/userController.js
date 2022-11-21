@@ -13,7 +13,9 @@ module.exports = function UserController(req, res) {
 
   Array.from({ length: 200 }).forEach(() => {
     const user = createRandomUser();
-    faker.helpers.maybe(() => makeErrors(error, user), { probability: error });
+    for (let i = error; i > 0; i--) {
+      faker.helpers.maybe(() => makeErrors(user), { probability: i });
+    }
     users.push(user);
   });
 
@@ -42,7 +44,7 @@ module.exports = function UserController(req, res) {
 
 function createRandomUser() {
   return {
-    userId: faker.datatype.uuid(),
+    userId: faker.datatype.uuid().slice(0, 11),
     name: faker.name.fullName(),
     address:
       faker.address.zipCode() +
@@ -54,34 +56,32 @@ function createRandomUser() {
   };
 }
 
-function makeErrors(error, user) {
-  for (let i = 0; i < error; i++) {
-    const keyFieldError = faker.helpers.objectKey(user);
-    const filedOfError = user[keyFieldError];
-    let arrayFromField = filedOfError.split("");
-    const typeError = faker.helpers.arrayElement(["swap", "add", "delete"]);
-    const letterOfError = faker.helpers.arrayElement(arrayFromField);
-    const pos = arrayFromField.indexOf(letterOfError);
-    switch (typeError) {
-      case "swap":
-        arrayFromField = [
-          ...arrayFromField.slice(0, pos),
-          arrayFromField[pos + 1],
-          arrayFromField[pos],
-          ...arrayFromField.slice([pos + 2]),
-        ];
-        break;
-      case "add":
-        const randomLetter = faker.random.alpha();
-        arrayFromField.splice(pos, 0, randomLetter);
-        break;
-      case "delete":
-        arrayFromField.splice(pos, 1);
-        break;
-      default:
-        break;
-    }
-    const changedFeld = arrayFromField.join("");
-    user[keyFieldError] = changedFeld;
+function makeErrors(user) {
+  const keyFieldError = faker.helpers.objectKey(user);
+  const filedOfError = user[keyFieldError];
+  let arrayFromField = filedOfError.split("");
+  const typeError = faker.helpers.arrayElement(["swap", "add", "delete"]);
+  const letterOfError = faker.helpers.arrayElement(arrayFromField);
+  const pos = arrayFromField.indexOf(letterOfError);
+  switch (typeError) {
+    case "swap":
+      arrayFromField = [
+        ...arrayFromField.slice(0, pos),
+        arrayFromField[pos + 1],
+        arrayFromField[pos],
+        ...arrayFromField.slice([pos + 2]),
+      ];
+      break;
+    case "add":
+      const randomLetter = faker.random.alpha();
+      arrayFromField.splice(pos, 0, randomLetter);
+      break;
+    case "delete":
+      arrayFromField.splice(pos, 1);
+      break;
+    default:
+      break;
   }
+  const changedFeld = arrayFromField.join("");
+  user[keyFieldError] = changedFeld;
 }
