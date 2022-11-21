@@ -1,11 +1,9 @@
 const { faker } = require("@faker-js/faker");
-const ApiError = require("../error/ApiError");
 
 module.exports = function UserController(req, res) {
   const locale = req.query.locale;
   const seed = parseInt(req.query.seed);
   const error = parseFloat(req.query.error);
-
   const page = parseInt(req.query.page);
   const limit = parseInt(req.query.limit);
 
@@ -13,7 +11,7 @@ module.exports = function UserController(req, res) {
   faker.seed(seed + page);
   const users = [];
 
-  Array.from({ length: 100 }).forEach(() => {
+  Array.from({ length: 200 }).forEach(() => {
     const user = createRandomUser();
     faker.helpers.maybe(() => makeErrors(error, user), { probability: error });
     users.push(user);
@@ -76,6 +74,7 @@ function makeErrors(error, user) {
       case "add":
         const randomLetter = faker.random.alpha();
         arrayFromField.splice(pos, 0, randomLetter);
+        break;
       case "delete":
         arrayFromField.splice(pos, 1);
         break;
